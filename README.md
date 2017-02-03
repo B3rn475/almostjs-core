@@ -4,7 +4,7 @@ ALMOsT is an AgiLe MOdel Transformation framework for JavaScript
 [![NPM Version][npm-image]][npm-url]
 [![Linux Build][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
-[![MIT licensed](license-image)](license-url)
+[![MIT licensed][license-image]][license-url]
 
 
 [npm-image]: https://img.shields.io/npm/v/almost-core.svg
