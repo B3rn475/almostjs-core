@@ -6,6 +6,9 @@ __ALMOsT__ is an **A**gi**L**e **MO**del **T**ransformation framework for JavaSc
 [![Test Coverage][coveralls-image]][coveralls-url]
 [![MIT licensed][license-image]][license-url]
 
+This repository contains the core components.
+For a set helpers see the whole project [ALMOsT](https://github.com/B3rn475/almostjs)
+
 __ALMOsT__ requires the following components:
  - A __Model__ to transform
  - A set of **Rule**s
