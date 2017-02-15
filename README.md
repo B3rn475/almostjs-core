@@ -17,7 +17,7 @@ __ALMOsT__ requires the following components:
 ## Installation
 
 ```bash
-$ npm install express-core
+$ npm install almost-core
 ```
 
 ## The Model
