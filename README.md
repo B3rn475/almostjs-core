@@ -6,13 +6,8 @@ __ALMOsT__ is an **A**gi**L**e **MO**del **T**ransformation framework for JavaSc
 [![Test Coverage][coveralls-image]][coveralls-url]
 [![MIT licensed][license-image]][license-url]
 
-This repository contains the core components.
-For a whole set of helpers see the whole project [ALMOsT](https://github.com/B3rn475/almostjs)
-
-__ALMOsT__ requires the following components:
- - A __Model__ to transform
- - A set of **Rule**s
- - A __Reduction__ configuration
+This repository contains a low level graph traversing and aggregation framework used by [ALMOsT](https://github.com/B3rn475/almostjs).
+It is mainly manted as a generic __graph__ to __tree__ transformation framework.
 
 ## Installation
 
@@ -20,195 +15,138 @@ __ALMOsT__ requires the following components:
 $ npm install almost-core
 ```
 
-## The Model
+## The Pipeline
 
-__ALMOsT__ does not make any assumption on the structure of your your elements or relations between elements.
-The only assumption is made on the structure of the input model.
+The transformation follows the following steps
+ - __Graph Traversing__ during this phase the input graph (JSON Object) is traversed and a set of analysis points are set
+ - __Analysis Execution__ the analysis points are execute one at a time and results are collected
+ - __Results Aggregation__ the results are aggregated to generated a final tree
 
-It must be an __Object__ with at least two properties __elements__ and __relations__ which are **Array**s.
-
-```javascript
-  {
-    "elements": [],
-    "relations": []
-  }
-```
-
-## The Rules
-
-In __ALMOsT__ rules are created through the __createRule__ maker function.
-
-```javascript
-  var createRule = require('almost-core').createRule;
-  
-  var rule = createRule(
-      activationExpression,
-      body
-    );
-```
-
-The __Activation Expression__ is a function which is invoked by the framework to identify if the current rule should be invoked.
-
-```javascript
-  // ActivationExpression which always activates the related rule
-  function always() { return true; }
-```
-
-The __Body__ is a function which returns an __Object__ which is the result of the rule.
-
-```javascript
-  // Body which generates nothing
-  function always() { return {
-    key: value // must be an object
-  }; }
-```
-
-There are three type of rules:
- - __Model__ rules (rules applied to the whole model)
- - __Element__ rules (rules applied to each element)
- - __Relation__ rules (rules applied to each relation)
- 
-### Model Rules
-
-__Model__ rules are applied just once to the entire model.
-The input of both __Activation Expression__ and __Body__ is the model itself.
-
-```javascript
-  createRule(
-    function (model) {
-      // check if the rule should be applied
-      return result_of_the_check;
-    },
-    function (model) {
-      // generate some results
-      return result;
-    },
-  );
-```
-
-### Element Rules
-
-__Element__ rules are applied on element in the input model.
-The input of both __Activation Expression__ and __Body__ is the the current element and the model.
-
-```javascript
-  createRule(
-    function (element, model) {
-      // check if the rule should be applied
-      return result_of_the_check;
-    },
-    function (element, model) {
-      // generate some results
-      return result;
-    },
-  );
-```
-
-### Relation Rules
-
-__Relation__ rules are applied on element in the input model.
-The input of both __Activation Expression__ and __Body__ is the the current relation and the model.
-
-```javascript
-  createRule(
-    function (relation, model) {
-      // check if the rule should be applied
-      return result_of_the_check;
-    },
-    function (relation, model) {
-      // generate some results
-      return result;
-    },
-  );
-```
+This is an high level view over the system, under the hood we optimize the process in order to interleave analyis points execution and aggregation. This allows us to reduce the final memory footprint.
 
 ## The Transformer
 
-In __ALMOsT__ the model transformation is applied via a __Transformer__.
-A transforme is created through the __createTransformer__ maker function.
+A transformer is a reusable function which hides the previously presented pipeline.
+It can be constructed using the `createTransformer(traverse, [reduce])` maker function.
 
 ```javascript
-  var createRule = require('almost-core').createTransformer;
-  
-  var transformer = createTransformer({
-    model: modelRules, // rules related to the model
-    element: elementRules, // rules related to the elements
-    relation: relationRules, // rules related to the relations
-    reduce: reduceConfiguration // how to compact the results
+ var core = require('almost-core');
+ 
+ var transform = core.createTransformer(traverse);
+ 
+ var output1 = transform(input1);
+ var output2 = transform(input2);
+ // ...
+ var outputN = transform(inputN);
+```
+
+The arguments of __createTransformer__ are the following:
+ - __traverse__ `function (input, emit)` it is responsible of traversing the graph and "emit" a set of functions which represent the analysis points on the graph. Each function emitted will be invoked once (potentially out of order), with the input object as parameter
+ - __reduce__ [optional] 'function (accumulator, value)', it is responsible of aggregate the results of the analysis points (by default the results are concatenated)
+ 
+### Basic Examples
+
+#### toPairs
+This example creates a transformer which transforms an __Object__ into an __Array__ of `[key, value]` pairs.
+
+```javascript
+ var core = require('almost-core');
+ 
+ var toPairs = core.createTransformer(function (input, emit) {
+  Object.keys(input).forEach(function (key) {
+   emit(function (object) { return object[key]; });
   });
-  
-  var result1 = transform(model1);
-  var result2 = transform(model2);
-  // a transformer can be reused many times.
-  var resultN = transform(modelN);
+ });
+ 
+ toPairs({a: 1, b: 2, c: 3}) // result: [['a', 1], ['b', 2], ['c', 3]]
 ```
 
-A __Transformer__ is a function which takes as input a __Model__ object and returns the aggregated results.
-It requires a set of **Rule**s related to __Model__, **Element**s and **Relation**s.
-
-### Reduce Configuration
-
-The results of the activated rules are aggregated/merged in a single object.
-
-If results of different rules have the same key the related objects are aggregated.
+#### fromPairs
+This example creates a transformer which transforms an a __Array__ of `[key, value]` pairs into an __Object__.
 
 ```javascript
-  // Result of rule A
-  {
-    foo: fooA,
-    bar: barA
-  }
-  // Result of rule B
-  {
-    bar: barB
-  }
-  // Aggregated result
-  {
-    foo: aggregation(fooA),
-    bar: aggregation(barA, barB)
-  }
-```
-The attributes of these **Object**s are aggregated using the following policies:
- - __Concatenation__ [default] all the values are stored in an array
- - __First__ the first encountered value is stored (non deterministic)
- - __Last__ the last encountered value is stored (non deterministic)
- - __Minimum__ the minimum value is stored
- - __Maximum__ the greater value is stored
- - __Custom__ same as __Concatenation__, but values are passed to a user provided function which is responsible of the aggregation
-
-The __Reduction Configuration__ object is used to define these policies
-
-```javascript
-  var transformer = createTransformer({
-    model: modelRules, // rules related to the model
-    element: elementRules, // rules related to the elements
-    relation: relationRules, // rules related to the relations
-    reduce: {
-      attr1: 'concat',
-      attr2: 'min',
-      attr3: 'max',
-      attr4: function (values) {
-        // return something
-      }
-    }
+ var core = require('almost-core');
+ 
+ var fromPairs = core.createTransformer(function (input, emit) {
+  input.forEach(function (pair) {
+   emit(function () { var object = {}; object[pair[0]] = pair[1]; return object; });
   });
+ }, function (accumulator, value) {
+  Object.keys(value).forEach(function (key) {
+    accumulator[key] = value[key];
+  });
+  return accumulator;
+ });
+ 
+ fromPairs([['a', 1], ['b', 2], ['c', 3]]) // result: {a: 1, b: 2, c: 3}
 ```
 
+## Reducer
+
+In order to make custom reduction policies, we provide a `reduce(iteratee, [accumulator], [terminate])` maker function.
+
 ```javascript
-  // Result of rule A
-  {
-    foo: { attr1: 'Afoo', attr2: 'Afoo', attr3: 'Afoo' },
-    bar: { attr1: 'Abar', attr2: 'Abar', attr3: 'Abar' },
+ var core = require('almost-core');
+
+ var first = core.reduce(function (accumulator) { return accumulator; });
+ var sum = core.reduce(function (accumulator, value) { return accumulator + value; }, 0);
+ var avg = core.reduce(
+  function (accumulator, value) {
+   accumulator.sum += value;
+   accumulator.count += 1;
+   return accumulator;
+  },
+  {sum: 0, count: 0},
+  function (accumulated) {
+   if (accumulated.count > 0) {
+    return accumulated.sum / accumulated.count;
+   }
   }
-  // Result of rule B
+ );
+```
+
+We provide a set of helpers to generate complex reduction policies:
+ - `none([error])` if even one value is generated an exception is thrown (useful in conjunction with `merge`)
+ - `single([error])` if more than one value is generated an exception is thrown (useful in conjunction with `merge`)
+ - `first([default])` it returns the first value encountered (if the `default` argument is passed it will be considered as first element if none are generated)
+ - `last([default])` it returns the last value encountered (if the `default` argument is passed it will be considered as first element in the sequence)
+ - `concat()` it concatenates all the encountered values in an array
+ - `flatten()` it concatenates all the encountered values in an array (arrays are flattened in single elements)
+ - `flattenDeep()` it concatenates all the encountered values in an array (arrays are flattened in single elements recursively)
+ - `merge([policy], [specials])` all the encountered objects will be merged using the last value encountered for each property (if the `policy` argument is provided it will be used to reduce the different values encountered for each property, if the `specials` argument is provided it is expected to be an object with the form `{key: policy, ...}` the policies defined will be used instead of the default one for the related key)
+
+### Example
+
+#### fromPairs 2.0
+This example creates a transformer which transforms an a __Array__ of `[key, value]` pairs into an __Object__.
+
+```javascript
+ var core = require('almost-core');
+ 
+ var fromPairs = core.createTransformer(function (input, emit) {
+  input.forEach(function (pair) {
+   emit(function () { var object = {}; object[pair[0]] = pair[1]; return object; });
+  });
+ }, core.merge());
+ 
+ fromPairs([['a', 1], ['b', 2], ['c', 3]]) // result: {a: 1, b: 2, c: 3}
+```
+
+
+#### ALMOsT Model Merging
+This example creates a transformer which transforms an a __Array__ of `{elements:[...], relations: [...], metadata: {}}` intermediate models into an a final __Object__.
+
+```javascript
+ var core = require('almost-core');
+ 
+ var M2MReduce = core.merge(
+  core.none('Just elements, realtions and metadata should be generated'),
   {
-    bar: { attr1: 'Bbar', attr2: 'Bbar', attr3: 'Bbar' },
+   elements: core.flatten(),
+   relations: core.flatten(),
+   metadata: core.merge()
   }
-  // Aggregated result
-  {
-    foo: { attr1: ['Afoo'], attr2: 'Afoo', attr3: 'Afoo' },
-    bar: { attr1: ['Abar', 'Bbar'], attr2: 'Abar', attr3: 'Bbar' }    
-  }
+ );
 ```
 
 [npm-image]: https://img.shields.io/npm/v/almost-core.svg
