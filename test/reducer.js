@@ -335,29 +335,59 @@ describe('Reducer', function () {
                 var first = {},
                     second = {},
                     reduce = r.merge();
-                assert.deepEqual(invoke([{a: first}, {a: second}], reduce), {a: second});
+                assert.deepEqual(invoke([{a: first}, {a: second}], reduce),
+                    {a: second});
             });
             it('should use the default policy', function () {
                 var first = {},
                     second = {},
                     reduce = r.merge(r.first());
-                assert.deepEqual(invoke([{a: first}, {a: second}], reduce), {a: first});
+                assert.deepEqual(invoke([{a: first}, {a: second}], reduce),
+                    {a: first});
             });
-            it('should use the default policy even on single values', function () {
+            it(
+                'should use the default policy even on single values',
+                function () {
+                    var first = {},
+                        reduce = r.merge(r.concat());
+                    assert.deepEqual(invoke([{a: first}], reduce),
+                        {a: [first]});
+                }
+            );
+            it('should use the terminate on the policy', function () {
                 var first = {},
-                    reduce = r.merge(r.concat());
-                assert.deepEqual(invoke([{a: first}], reduce), {a: [first]});
+                    second = {},
+                    third = {},
+                    reduce = r.merge(r.flatten());
+                assert.deepEqual(
+                    invoke([{a: first}, {a: [second, third]}], reduce),
+                    {a: [first, second, third]}
+                );
             });
             it('should use the overloaded policies', function () {
                 var first = {},
                     second = {},
                     reduce = r.merge(r.first(), {b: r.concat()});
-                assert.deepEqual(invoke([{a: first, b: second}, {a: second}], reduce), {a: first, b: [second]});
+                assert.deepEqual(
+                    invoke([{a: first, b: second}, {a: second}], reduce),
+                    {a: first, b: [second]}
+                );
             });
             it('should use the accumulator on overloaded policies', function () {
                 var first = {},
                     reduce = r.merge(r.first(), {b: r.concat()});
-                assert.deepEqual(invoke([{a: first}], reduce), {a: first, b: []});
+                assert.deepEqual(invoke([{a: first}], reduce),
+                    {a: first, b: []});
+            });
+            it('should use the terminate on overloaded policies', function () {
+                var first = {},
+                    second = {},
+                    third = {},
+                    reduce = r.merge(r.first(), {a: r.flatten()});
+                assert.deepEqual(
+                    invoke([{a: first}, {a: [second, third]}], reduce),
+                    {a: [first, second, third]}
+                );
             });
         });
     });
