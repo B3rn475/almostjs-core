@@ -5,117 +5,339 @@
 /*global describe, it*/
 "use strict";
 
-var assert = require('assert'),
+var _ = require('lodash'),
+    assert = require('assert'),
     async = require('async'),
     sinon = require('sinon'),
-    createReducer = require('../lib/reducer');
+    r = require('../lib/reducer'),
+    Exception = require('../lib/exception');
 
-function noop() { return undefined; }
+function invoke(input, reducer) {
+    var accumulated;
+    if (reducer.hasOwnProperty('accumulator')) {
+        accumulated = _(input).reduce(reducer, _.cloneDeep(reducer.accumulator));
+    } else {
+        accumulated = _(input).reduce(reducer);
+    }
+    if (reducer.hasOwnProperty('terminate')) {
+        return reducer.terminate(accumulated);
+    }
+    return accumulated;
+}
 
 describe('Reducer', function () {
-    it('should be a function', function () {
-        assert.equal(typeof createReducer, 'function');
+    it('should be an object', function () {
+        assert.equal(typeof r, 'object');
     });
-    it('should accept 1 argument', function () {
-        assert.equal(createReducer.length, 1);
+    it('shouldn\'t be an array', function () {
+        assert.ok(!Array.isArray(r));
     });
-    describe('Creation', function () {
+    describe('reduce', function () {
+        it('should be a function', function () {
+            assert.equal(typeof r.reduce, 'function');
+        });
+        it('shouldn throw with no arguments', function () {
+            assert.throws(function () {
+                r.reduce();
+            }, Exception);
+        });
+        it('should throw with a non function first argument', function () {
+            assert.throws(function () { r.reduce(undefined); }, Exception);
+            assert.throws(function () { r.reduce(0); }, Exception);
+            assert.throws(function () { r.reduce(1); }, Exception);
+            assert.throws(function () { r.reduce(true); }, Exception);
+            assert.throws(function () { r.reduce(false); }, Exception);
+            assert.throws(function () { r.reduce({}); }, Exception);
+            assert.throws(function () { r.reduce([]); }, Exception);
+            assert.throws(function () { r.reduce(null); }, Exception);
+            assert.throws(function () { r.reduce(''); }, Exception);
+            assert.throws(function () { r.reduce('value'); }, Exception);
+            assert.throws(function () { r.reduce(/ /); }, Exception);
+        });
+        it('should accept a function as first argument', function () {
+            r.reduce(_.noop);
+        });
         it('should return a function', function () {
-            var reducer = createReducer();
-            assert.equal(typeof reducer, 'function');
+            assert.equal(typeof r.reduce(_.noop), 'function');
         });
-        it('should throw if bad config', function () {
-            assert.throws(function () { createReducer(''); });
-            assert.throws(function () { createReducer(0); });
-            assert.throws(function () { createReducer(1); });
-            assert.throws(function () { createReducer({prop: null}); });
-            assert.throws(function () { createReducer({prop: {}}); });
-            assert.throws(function () { createReducer({prop: / /}); });
-            assert.throws(function () { createReducer({prop: ''}); });
-            assert.throws(function () { createReducer({prop: 0}); });
-            assert.throws(function () { createReducer({prop: 1}); });
+        it('should not return the same function', function () {
+            assert.notEqual(r.reduce(_.noop), _.noop);
         });
-    });
-    describe('Invocation', function () {
-        it('should work with not objects', function () {
-            var reduced = createReducer()([]);
-            assert.equal(typeof reduced, 'object');
+        it('should return a function', function () {
+            assert.equal(typeof r.reduce(_.noop), 'function');
         });
-        it('should work with 1 object', function () {
-            var value = {},
-                reduced = createReducer()([{prop: value}]);
-            assert.equal(typeof reduced, 'object');
-            assert.equal(Array.isArray(reduced.prop), true);
-            assert.equal(reduced.prop.length, 1);
-            assert.equal(reduced.prop[0], value);
+        it('should not invoke the function during initialization', function () {
+            var accumulate = sinon.spy();
+            r.reduce(accumulate);
+            assert.ok(!accumulate.called);
         });
-        it('should not change the date by default', function () {
-            var value1 = {},
-                value2 = {},
-                reduced = createReducer()([{prop: value1}, {prop: value2}]);
-            assert.equal(typeof reduced, 'object');
-            assert.equal(Array.isArray(reduced.prop), true);
-            assert.equal(reduced.prop.length, 2);
-            assert.equal(reduced.prop[0], value1);
-            assert.equal(reduced.prop[1], value2);
+        it('should attach a copy of the accumulator', function () {
+            var accumulator = {},
+                reduce = r.reduce(_.noop, accumulator);
+            assert.notEqual(reduce.accumulator, accumulator);
+            assert.deepEqual(reduce.accumulator, accumulator);
         });
-    });
-    describe('Methods', function () {
-        it('should use first', function () {
-            var values = [{prop: 1}, {prop: 0}, {prop: 2}],
-                reduced = createReducer({prop: 'first'})(values);
-            assert.equal(typeof reduced, 'object');
-            assert.equal(reduced.prop, values[0].prop);
+        it('should throw with a non function third argument', function () {
+            assert.throws(function () { r.reduce(_.noop, null, undefined); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, 0); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, 1); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, true); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, false); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, {}); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, []); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, null); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, ''); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, 'value'); }, Exception);
+            assert.throws(function () { r.reduce(_.noop, null, / /); }, Exception);
         });
-        it('should use last', function () {
-            var values = [{prop: 2}, {prop: 0}, {prop: 1}],
-                reduced = createReducer({prop: 'last'})(values);
-            assert.equal(typeof reduced, 'object');
-            assert.equal(reduced.prop, values[2].prop);
+        it('should accept a function as thirde argument', function () {
+            r.reduce(_.noop, null, _.noop);
         });
-        it('should use min', function () {
-            var values = [{prop: 2}, {prop: 0}, {prop: 1}],
-                reduced = createReducer({prop: 'min'})(values);
-            assert.equal(typeof reduced, 'object');
-            assert.equal(reduced.prop, values[1].prop);
+        it('should not invoke the terminate function during initialization', function () {
+            var terminate = sinon.spy();
+            r.reduce(_.noop, null, terminate);
+            assert.ok(!terminate.called);
         });
-        it('should use max', function () {
-            var values = [{prop: 0}, {prop: 2}, {prop: 1}],
-                reduced = createReducer({prop: 'max'})(values);
-            assert.equal(typeof reduced, 'object');
-            assert.equal(reduced.prop, values[1].prop);
+        it('should attach a copy of the accumulator', function () {
+            var terminate = sinon.spy(),
+                reduce = r.reduce(_.noop, null, terminate);
+            assert.equal(reduce.terminate, terminate);
         });
-        it('should use concat', function () {
-            var value1 = {},
-                value2 = {},
-                reduced = createReducer({prop: 'concat'})([{prop: value1}, {prop: value2}]);
-            assert.equal(typeof reduced, 'object');
-            assert.equal(Array.isArray(reduced.prop), true);
-            assert.equal(reduced.prop.length, 2);
-            assert.equal(reduced.prop[0], value1);
-            assert.equal(reduced.prop[1], value2);
+        describe('should not invoke the reducer if no element is passed', function () {
+            var accumulate = sinon.spy(),
+                reduce = r.reduce(accumulate);
+            assert.equal(_([]).reduce(reduce), undefined);
+            assert.ok(!accumulate.called);
         });
-        it('should use concat (by default)', function () {
-            var value1 = {},
-                value2 = {},
-                reduced = createReducer({prop: undefined})([{prop: value1}, {prop: value2}]);
-            assert.equal(typeof reduced, 'object');
-            assert.equal(Array.isArray(reduced.prop), true);
-            assert.equal(reduced.prop.length, 2);
-            assert.equal(reduced.prop[0], value1);
-            assert.equal(reduced.prop[1], value2);
+        describe('should not invoke the reducer if one element is passed', function () {
+            var first = {},
+                accumulate = sinon.spy(),
+                reduce = r.reduce(accumulate);
+            assert.equal(_([first]).reduce(reduce), first);
+            assert.ok(!accumulate.called);
         });
-        it('should use custom', function () {
-            var values = [{prop: 0}, {prop: 2}, {prop: 1}],
-                custom = sinon.spy(function (values) {
-                    assert.equal(Array.isArray(values), true);
-                    assert.equal(values.length, 3);
-                    return values[1];
+        describe('should invoke the reducer if two elements are passed', function () {
+            var first = {},
+                second = {},
+                result = {},
+                accumulate = sinon.spy(function (accumulated, value) {
+                    assert.equal(accumulated, first);
+                    assert.equal(value, second);
+                    return result;
                 }),
-                reduced = createReducer({prop: custom})(values);
-            assert.equal(typeof reduced, 'object');
-            assert.equal(reduced.prop, values[1].prop);
-            assert.equal(custom.called, true);
+                reduce = r.reduce(accumulate);
+            assert.equal(_([first, second]).reduce(reduce), result);
+            assert.ok(accumulate.calledOnce);
+        });
+        describe('should invoke the reducer if one element and the accumulator are passed', function () {
+            var first = {},
+                accumulator = {},
+                result = {},
+                accumulate = sinon.spy(function (accumulated, value) {
+                    assert.equal(accumulated, accumulator);
+                    assert.equal(value, first);
+                    return result;
+                }),
+                reduce = r.reduce(accumulate, accumulator);
+            assert.equal(_([first]).reduce(reduce, accumulator), result);
+            assert.ok(accumulate.calledOnce);
+        });
+    });
+    describe('helpers', function () {
+        describe('single', function () {
+            it('should be a function', function () {
+                assert.equal(typeof r.single, 'function');
+            });
+            it('should return undefined with not elements', function () {
+                var reduce = r.single();
+                assert.equal(invoke([], reduce), undefined);
+            });
+            it('should return a single element', function () {
+                var element = {},
+                    reduce = r.single();
+                assert.equal(invoke([element], reduce), element);
+            });
+            it('should return throw with more elements', function () {
+                var reduce = r.single();
+                assert.throws(function () {
+                    invoke([1, 2], reduce);
+                });
+            });
+        });
+        describe('first', function () {
+            it('should be a function', function () {
+                assert.equal(typeof r.first, 'function');
+            });
+            it('should return undefined with not elements', function () {
+                var reduce = r.first();
+                assert.equal(invoke([], reduce), undefined);
+            });
+            it('should return a single element', function () {
+                var element = {},
+                    reduce = r.first();
+                assert.equal(invoke([element], reduce), element);
+            });
+            it('should return the first with more elements', function () {
+                var first = {},
+                    second = {},
+                    reduce = r.first();
+                assert.equal(invoke([first, second], reduce), first);
+            });
+        });
+        describe('last', function () {
+            it('should be a function', function () {
+                assert.equal(typeof r.last, 'function');
+            });
+            it('should return undefined with not elements', function () {
+                var reduce = r.last();
+                assert.equal(invoke([], reduce), undefined);
+            });
+            it('should return a single element', function () {
+                var element = {},
+                    reduce = r.last();
+                assert.equal(invoke([element], reduce), element);
+            });
+            it('should return the last with more elements', function () {
+                var first = {},
+                    second = {},
+                    reduce = r.last();
+                assert.equal(invoke([first, second], reduce), second);
+            });
+        });
+        describe('concat', function () {
+            it('should be a function', function () {
+                assert.equal(typeof r.concat, 'function');
+            });
+            it('should return empty array with not elements', function () {
+                var reduce = r.concat();
+                assert.deepEqual(invoke([], reduce), []);
+            });
+            it('should return an array of one element', function () {
+                var element = {},
+                    reduce = r.concat();
+                assert.deepEqual(invoke([element], reduce), [element]);
+            });
+            it('should return all the elements', function () {
+                var first = {$first: 1},
+                    second = {$second: 1},
+                    reduce = r.concat();
+                assert.deepEqual(invoke([first, second], reduce), [first, second]);
+            });
+            it('shouldn\'t flatten', function () {
+                var first = {$first: 1},
+                    second = {$second: 1},
+                    reduce = r.concat();
+                assert.deepEqual(invoke([first, [second]], reduce), [first, [second]]);
+            });
+        });
+        describe('flatten', function () {
+            it('should be a function', function () {
+                assert.equal(typeof r.flatten, 'function');
+            });
+            it('should return empty array with not elements', function () {
+                var reduce = r.flatten();
+                assert.deepEqual(invoke([], reduce), []);
+            });
+            it('should return an array of one element', function () {
+                var element = {},
+                    reduce = r.flatten();
+                assert.deepEqual(invoke([element], reduce), [element]);
+            });
+            it('should return all the elements', function () {
+                var first = {$first: 1},
+                    second = {$second: 1},
+                    reduce = r.flatten();
+                assert.deepEqual(invoke([first, second], reduce), [first, second]);
+            });
+            it('should flatten one level', function () {
+                var first = {$first: 1},
+                    second = {$second: 1},
+                    reduce = r.flatten();
+                assert.deepEqual(invoke([first, [second]], reduce), [first, second]);
+            });
+            it('shouldn\'t flatten two levels', function () {
+                var first = {$first: 1},
+                    second = {$second: 1},
+                    reduce = r.flatten();
+                assert.deepEqual(invoke([first, [[second]]], reduce), [first, [second]]);
+            });
+        });
+        describe('flattenDeep', function () {
+            it('should be a function', function () {
+                assert.equal(typeof r.flattenDeep, 'function');
+            });
+            it('should return empty array with not elements', function () {
+                var reduce = r.flattenDeep();
+                assert.deepEqual(invoke([], reduce), []);
+            });
+            it('should return an array of one element', function () {
+                var element = {},
+                    reduce = r.flattenDeep();
+                assert.deepEqual(invoke([element], reduce), [element]);
+            });
+            it('should return all the elements', function () {
+                var first = {$first: 1},
+                    second = {$second: 1},
+                    reduce = r.flattenDeep();
+                assert.deepEqual(invoke([first, second], reduce), [first, second]);
+            });
+            it('should flatten one level', function () {
+                var first = {$first: 1},
+                    second = {$second: 1},
+                    reduce = r.flattenDeep();
+                assert.deepEqual(invoke([first, [second]], reduce), [first, second]);
+            });
+            it('should flatten two levels', function () {
+                var first = {$first: 1},
+                    second = {$second: 1},
+                    reduce = r.flattenDeep();
+                assert.deepEqual(invoke([first, [[second]]], reduce), [first, second]);
+            });
+        });
+        describe('merge', function () {
+            it('should be a function', function () {
+                assert.equal(typeof r.merge, 'function');
+            });
+            it('should return empty object with not elements', function () {
+                var reduce = r.merge();
+                assert.deepEqual(invoke([], reduce), {});
+            });
+            it('should return a single element', function () {
+                var reduce = r.merge();
+                assert.deepEqual(invoke([{}], reduce), {});
+            });
+            it('should return an object with more elements', function () {
+                var reduce = r.merge();
+                assert.deepEqual(invoke([{}, {}], reduce), {});
+            });
+            it('should keep the last element by default', function () {
+                var first = {},
+                    second = {},
+                    reduce = r.merge();
+                assert.deepEqual(invoke([{a: first}, {a: second}], reduce), {a: second});
+            });
+            it('should use the default policy', function () {
+                var first = {},
+                    second = {},
+                    reduce = r.merge(r.first());
+                assert.deepEqual(invoke([{a: first}, {a: second}], reduce), {a: first});
+            });
+            it('should use the default policy even on single values', function () {
+                var first = {},
+                    reduce = r.merge(r.concat());
+                assert.deepEqual(invoke([{a: first}], reduce), {a: [first]});
+            });
+            it('should use the overloaded policies', function () {
+                var first = {},
+                    second = {},
+                    reduce = r.merge(r.first(), {b: r.concat()});
+                assert.deepEqual(invoke([{a: first, b: second}, {a: second}], reduce), {a: first, b: [second]});
+            });
+            it('should use the accumulator on overloaded policies', function () {
+                var first = {},
+                    reduce = r.merge(r.first(), {b: r.concat()});
+                assert.deepEqual(invoke([{a: first}], reduce), {a: first, b: []});
+            });
         });
     });
 });

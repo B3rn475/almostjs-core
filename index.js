@@ -4,23 +4,22 @@
 /*jslint node: true*/
 "use strict";
 
-var Transformer = require('./lib/transformer'),
-    Rule = require('./lib/rule'),
-    Reducer = require('./lib/reducer'),
+var createTransformer = require('./lib/transformer'),
+    reducers = require('./lib/reducer'),
     Exception = require('./lib/exception');
 
-// Constructors
-exports.Transformer = Transformer;
-exports.Rule = Rule;
+
+//
 exports.Exception = Exception;
 
 // Maker Functions
-exports.createTransformer = Transformer;
-exports.createRule = Rule;
+exports.createTransformer = createTransformer;
 
 // Helpers
-exports.first = Reducer.first;
-exports.last = Reducer.last;
-exports.min = Reducer.min;
-exports.max = Reducer.max;
-exports.concat = Reducer.concat;
+exports.reduce = reducers.reduce;
+exports.first = reducers.first;
+exports.last = reducers.last;
+exports.concat = reducers.concat;
+exports.flatten = reducers.flatten;
+exports.flattenDeep = reducers.flattenDeep;
+exports.merge = reducers.merge;
