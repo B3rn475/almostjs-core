@@ -144,6 +144,27 @@ describe('Reducer', function () {
         });
     });
     describe('helpers', function () {
+        describe('none', function () {
+            it('should be a function', function () {
+                assert.equal(typeof r.none, 'function');
+            });
+            it('should return undefined with not elements', function () {
+                var reduce = r.none();
+                assert.equal(invoke([], reduce), undefined);
+            });
+            it('should throw with one element', function () {
+                var reduce = r.none();
+                assert.throws(function () {
+                    invoke([1], reduce);
+                });
+            });
+            it('should throw with more elements', function () {
+                var reduce = r.none();
+                assert.throws(function () {
+                    invoke([1, 2], reduce);
+                });
+            });
+        });
         describe('single', function () {
             it('should be a function', function () {
                 assert.equal(typeof r.single, 'function');
@@ -157,7 +178,7 @@ describe('Reducer', function () {
                     reduce = r.single();
                 assert.equal(invoke([element], reduce), element);
             });
-            it('should return throw with more elements', function () {
+            it('should throw with more elements', function () {
                 var reduce = r.single();
                 assert.throws(function () {
                     invoke([1, 2], reduce);

@@ -17,6 +17,8 @@ exports.createTransformer = createTransformer;
 
 // Helpers
 exports.reduce = reducers.reduce;
+exports.none = reducers.single;
+exports.single = reducers.single;
 exports.first = reducers.first;
 exports.last = reducers.last;
 exports.concat = reducers.concat;
