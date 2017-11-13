@@ -398,6 +398,26 @@ describe('Reducer', function () {
                     {a: [first, second, third]}
                 );
             });
+            describe('should throw with invalid overloaded policies', function () {
+                it('undefined', function () {
+                    assert.throws(function () { r.merge(r.first(), undefined); });
+                });
+                it('bool (false)', function () {
+                    assert.throws(function () { r.merge(r.first(), false); });
+                });
+                it('bool (true)', function () {
+                    assert.throws(function () { r.merge(r.first(), true); });
+                });
+                it('string (empty)', function () {
+                    assert.throws(function () { r.merge(r.first(), ''); });
+                });
+                it('string', function () {
+                    assert.throws(function () { r.merge(r.first(), 'string'); });
+                });
+                it('number', function () {
+                    assert.throws(function () { r.merge(r.first(), 0); });
+                });
+            });
             it('should use the overloaded policies', function () {
                 var first = {},
                     second = {},
