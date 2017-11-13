@@ -111,6 +111,87 @@ describe('Reducer', function () {
             },
             reduce = function (accumulated) { return accumulated; },
             t = create(traverse, reduce);
-        assert.deepEqual(t(input), first);
+        assert.equal(t(input), first);
+    });
+    it('should use the accumulator', function () {
+        var first = {},
+            input = [first],
+            traverse = function (input, emit) {
+                input.forEach(function (value) {
+                    emit(function () { return value; });
+                });
+            },
+            reduce = function (accumulated) { return accumulated; },
+            t;
+        reduce.accumulator = 1;
+        t = create(traverse, reduce);
+        assert.equal(t(input), reduce.accumulator);
+    });
+    it('should clone the accumulator', function () {
+        var first = {},
+            input = [first],
+            traverse = function (input, emit) {
+                input.forEach(function (value) {
+                    emit(function () { return value; });
+                });
+            },
+            reduce = function (accumulated) { return accumulated; },
+            t;
+        reduce.accumulator = [1, 2];
+        t = create(traverse, reduce);
+        assert.notEqual(t(input), reduce.accumulator);
+        assert.deepEqual(t(input), reduce.accumulator);
+    });
+    it('should invoke terminate', function () {
+        var first = {},
+            second = {},
+            input = [first, second],
+            traverse = function (input, emit) {
+                input.forEach(function (value) {
+                    emit(function () { return value; });
+                });
+            },
+            reduce = function (accumulated) { return accumulated; },
+            t;
+        reduce.terminate = sinon.spy();
+        t = create(traverse, reduce);
+        assert.ok(!reduce.terminate.called);
+        t(input);
+        assert.ok(reduce.terminate.calledOnce);
+    });
+    it('should forward the accumulated value to terminate', function () {
+        var first = {},
+            second = {},
+            input = [first, second],
+            traverse = function (input, emit) {
+                input.forEach(function (value) {
+                    emit(function () { return value; });
+                });
+            },
+            reduce = function (accumulated) { return accumulated; },
+            t;
+        reduce.terminate = function (accumulated) {
+            assert.equal(accumulated, first);
+        };
+        t = create(traverse, reduce);
+        t(input);
+    });
+    it('should return the result of terminate', function () {
+        var first = {},
+            second = {},
+            final = {},
+            input = [first, second],
+            traverse = function (input, emit) {
+                input.forEach(function (value) {
+                    emit(function () { return value; });
+                });
+            },
+            reduce = function (accumulated) { return accumulated; },
+            t;
+        reduce.terminate = function () {
+            return final;
+        };
+        t = create(traverse, reduce);
+        assert.equal(t(input), final);
     });
 });

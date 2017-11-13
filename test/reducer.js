@@ -164,6 +164,23 @@ describe('Reducer', function () {
                     invoke([1, 2], reduce);
                 });
             });
+            it('should throw a message', function () {
+                var reduce = r.none();
+                try {
+                    invoke([1], reduce);
+                } catch (e) {
+                    assert.equal(typeof e.message, 'string');
+                }
+            });
+            it('should throw the forwarded message', function () {
+                var message = {},
+                    reduce = r.none(message);
+                try {
+                    invoke([1], reduce);
+                } catch (e) {
+                    assert.equal(e.message, message);
+                }
+            });
         });
         describe('single', function () {
             it('should be a function', function () {
@@ -183,6 +200,23 @@ describe('Reducer', function () {
                 assert.throws(function () {
                     invoke([1, 2], reduce);
                 });
+            });
+            it('should throw a message', function () {
+                var reduce = r.single();
+                try {
+                    invoke([1, 2], reduce);
+                } catch (e) {
+                    assert.equal(typeof e.message, 'string');
+                }
+            });
+            it('should throw the forwarded message', function () {
+                var message = {},
+                    reduce = r.single(message);
+                try {
+                    invoke([1, 2], reduce);
+                } catch (e) {
+                    assert.equal(e.message, message);
+                }
             });
         });
         describe('first', function () {
