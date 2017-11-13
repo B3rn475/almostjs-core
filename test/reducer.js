@@ -398,33 +398,48 @@ describe('Reducer', function () {
                     {a: [first, second, third]}
                 );
             });
-            describe('should throw with invalid overloaded policies', function () {
-                it('undefined', function () {
-                    assert.throws(function () { r.merge(r.first(), undefined); });
-                });
-                it('bool (false)', function () {
-                    assert.throws(function () { r.merge(r.first(), false); });
-                });
-                it('bool (true)', function () {
-                    assert.throws(function () { r.merge(r.first(), true); });
-                });
-                it('string (empty)', function () {
-                    assert.throws(function () { r.merge(r.first(), ''); });
-                });
-                it('string', function () {
-                    assert.throws(function () { r.merge(r.first(), 'string'); });
-                });
-                it('number', function () {
-                    assert.throws(function () { r.merge(r.first(), 0); });
-                });
-            });
+            describe(
+                'should throw with invalid overloaded policies',
+                function () {
+                    it('undefined', function () {
+                        assert.throws(function () {
+                            r.merge(r.first(), undefined);
+                        });
+                    });
+                    it('bool (false)', function () {
+                        assert.throws(function () {
+                            r.merge(r.first(), false);
+                        });
+                    });
+                    it('bool (true)', function () {
+                        assert.throws(function () {
+                            r.merge(r.first(), true);
+                        });
+                    });
+                    it('string (empty)', function () {
+                        assert.throws(function () {
+                            r.merge(r.first(), '');
+                        });
+                    });
+                    it('string', function () {
+                        assert.throws(function () {
+                            r.merge(r.first(), 'string');
+                        });
+                    });
+                    it('number', function () {
+                        assert.throws(function () {
+                            r.merge(r.first(), 0);
+                        });
+                    });
+                }
+            );
             it('should use the overloaded policies', function () {
                 var first = {},
                     second = {},
-                    reduce = r.merge(r.first(), {b: r.concat()});
+                    reduce = r.merge(r.first(), {b: r.last()});
                 assert.deepEqual(
-                    invoke([{a: first, b: second}, {a: second}], reduce),
-                    {a: first, b: [second]}
+                    invoke([{a: first, b: first}, {a: second}], reduce),
+                    {a: first, b: second}
                 );
             });
             it('should use the accumulator on overloaded policies', function () {
