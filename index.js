@@ -17,11 +17,13 @@ exports.createTransformer = createTransformer;
 
 // Helpers
 exports.reduce = reducers.reduce;
-exports.none = reducers.single;
+exports.reduceBy = reducers.reduceBy;
+exports.none = reducers.none;
 exports.single = reducers.single;
 exports.first = reducers.first;
 exports.last = reducers.last;
+exports.merge = reducers.merge;
 exports.concat = reducers.concat;
+exports.groupBy = reducers.groupBy;
 exports.flatten = reducers.flatten;
 exports.flattenDeep = reducers.flattenDeep;
-exports.merge = reducers.merge;
