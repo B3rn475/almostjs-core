@@ -30,6 +30,6 @@
   "scripts": {
     "test": "mocha --recursive",
     "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --recursive",
-    "coveralls": "istanbul cover _mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
+    "coveralls": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --recursive -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
   }
 }
