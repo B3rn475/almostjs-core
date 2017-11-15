@@ -12,7 +12,7 @@ var _ = require('lodash'),
     create = require('../lib/transformer'),
     Exception = require('../lib/exception');
 
-describe('Reducer', function () {
+describe('Transformer', function () {
     it('should be an function', function () {
         assert.equal(typeof create, 'function');
     });
