@@ -137,4 +137,21 @@ describe('reduce', function () {
         assert.equal(invoke([first], reduce), result);
         assert.ok(accumulate.calledOnce);
     });
+    it('should invoke terminate even if no elements are passed', function () {
+        var terminate = sinon.spy(),
+            reduce = r.reduce(_.noop, undefined, terminate);
+        assert.equal(invoke([], reduce), undefined);
+        assert.ok(terminate.calledOnce);
+    });
+    it('should return terminate result', function () {
+        var result = [],
+            accumulator = {},
+            terminate = sinon.spy(function (accumulated) {
+                assert.notEqual(accumulated, accumulator);
+                assert.deepEqual(accumulated, accumulator);
+                return result;
+            }),
+            reduce = r.reduce(_.noop, accumulator, terminate);
+        assert.equal(invoke([], reduce), result);
+    });
 });

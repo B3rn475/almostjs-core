@@ -181,6 +181,40 @@ describe('flattenDeep', function () {
         assert.equal(invoke([[[first]], []], reduce), result);
         assert.ok(accumulate.calledOnce);
     });
+    it('should not invoke terminate if no elements are passed', function () {
+        var terminate = sinon.spy(),
+            policy = r.reduce(_.noop, undefined, terminate),
+            reduce = r.flatten(policy);
+        assert.equal(invoke([], reduce), undefined);
+        assert.ok(!terminate.called);
+    });
+    it('should not invoke terminate if no elements are passed one level deep', function () {
+        var terminate = sinon.spy(),
+            policy = r.reduce(_.noop, undefined, terminate),
+            reduce = r.flattenDeep(policy);
+        assert.equal(invoke([[], []], reduce), undefined);
+        assert.ok(!terminate.called);
+    });
+    it('should not invoke terminate if no elements are passed two level deep', function () {
+        var terminate = sinon.spy(),
+            policy = r.reduce(_.noop, undefined, terminate),
+            reduce = r.flattenDeep(policy);
+        assert.equal(invoke([[[]], []], reduce), undefined);
+        assert.ok(!terminate.called);
+    });
+    it('should return terminate result', function () {
+        var result = {},
+            accumulator = {accumulator: true},
+            terminate = sinon.spy(function (accumulated) {
+                assert.notEqual(accumulated, accumulator);
+                assert.deepEqual(accumulated, accumulator);
+                return result;
+            }),
+            policy = r.reduce(_.identity, accumulator, terminate),
+            reduce = r.flattenDeep(policy);
+        assert.equal(invoke([{}], reduce), result);
+        assert.ok(terminate.calledOnce);
+    });
     it('should concat by default', function () {
         var first = {},
             second = {},
