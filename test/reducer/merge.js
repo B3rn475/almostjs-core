@@ -266,11 +266,15 @@ describe('merge', function () {
             {a: first, b: second}
         );
     });
-    it('should use the accumulator on overloaded policies', function () {
+    it('should not initialize accumulation if no data is provided', function () {
         var first = {},
-            reduce = r.merge(r.first(), {b: r.concat()});
-        assert.deepEqual(invoke([{a: first}], reduce),
-            {a: first, b: []});
+            second = {},
+            third = {},
+            reduce = r.merge(r.first(), {b: r.flatten()});
+        assert.deepEqual(
+            invoke([{a: first}, {a: [second, third]}], reduce),
+            {a: first}
+        );
     });
     it('should use the terminate on overloaded policies', function () {
         var first = {},
