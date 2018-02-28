@@ -45,6 +45,27 @@ describe('merge', function () {
         var reduce = r.merge();
         assert.deepEqual(invoke([{}, {}], reduce), {});
     });
+    it('should return an array if all elements are arrays', function () {
+        var reduce = r.merge();
+        assert.deepEqual(invoke([[], []], reduce), []);
+        assert.ok(_.isArray(invoke([[], []], reduce)));
+    });
+    it('should return an array if all elements are arrays 1 deep', function () {
+        var reduce = r.merge();
+        assert.deepEqual(invoke([{a: []}, {a: []}], reduce), {a: []});
+        assert.ok(_.isArray(invoke([{a: []}, {a: []}], reduce).a));
+    });
+    it('should return an object if elements are mixed object or arrays', function () {
+        var reduce = r.merge();
+        assert.ok(!_.isArray(invoke([{a: []}, {a: {}}], reduce), {a: {}}));
+        assert.ok(!_.isArray(invoke([{a: {}}, {a: []}], reduce), {a: {}}));
+    });
+    it('should return an object if elements are mixed object or arrays 1 deep', function () {
+        var reduce = r.merge();
+        assert.ok(!_.isArray(invoke([{a: []}, {a: {}}], reduce), {a: {}}));
+        assert.ok(!_.isArray(invoke([{a: {}}, {a: []}], reduce), {a: {}}));
+    });
+
     it('should deep merge elements by default', function () {
         var reduce = r.merge();
         assert.deepEqual(invoke([{a: {b: {c: 1}}}, {a: {b: {d: 2}}}], reduce),
