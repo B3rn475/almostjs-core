@@ -21,7 +21,6 @@
     "lodash": "^4.17.4"
   },
   "devDependencies": {
-    "async": "^1.4.2",
     "coveralls": "latest",
     "istanbul": "latest",
     "mocha": "latest",
