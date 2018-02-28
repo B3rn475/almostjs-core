@@ -7,7 +7,6 @@
 
 var _ = require('lodash'),
     assert = require('assert'),
-    async = require('async'),
     sinon = require('sinon'),
     r = require('../../lib/reducer'),
     Exception = require('../../lib/exception');

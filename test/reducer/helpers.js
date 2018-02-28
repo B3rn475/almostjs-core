@@ -2,12 +2,11 @@
 // AUTHORS file for details. All rights reserved. Use of this source code is
 // governed by a MIT-style license that can be found in the LICENSE file.
 /*jslint node: true, nomen: true*/
-/*global describe, it*/
+/*global describe, it, before*/
 "use strict";
 
 var _ = require('lodash'),
     assert = require('assert'),
-    async = require('async'),
     sinon = require('sinon'),
     r = require('../../lib/reducer'),
     Exception = require('../../lib/exception');

@@ -23,6 +23,7 @@ exports.single = reducers.single;
 exports.first = reducers.first;
 exports.last = reducers.last;
 exports.merge = reducers.merge;
+exports.mergeOrSingle = reducers.mergeOrSingle;
 exports.concat = reducers.concat;
 exports.groupBy = reducers.groupBy;
 exports.flatten = reducers.flatten;

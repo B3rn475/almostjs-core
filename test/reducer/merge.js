@@ -7,8 +7,6 @@
 
 var _ = require('lodash'),
     assert = require('assert'),
-    async = require('async'),
-    sinon = require('sinon'),
     r = require('../../lib/reducer'),
     Exception = require('../../lib/exception');
 
@@ -76,145 +74,73 @@ describe('merge', function () {
         before(function () {
             reduce = r.merge();
         });
-        describe('top level', function () {
-            it('both elements', function () {
-                assert.throws(function () {
-                    invoke([1, 2], reduce);
-                });
-            });
-            it('first element', function () {
-                assert.throws(function () {
-                    invoke([1, {}], reduce);
-                });
-            });
-            it('second element', function () {
-                assert.throws(function () {
-                    invoke([{}, 1], reduce);
-                });
-            });
-            it('undefined', function () {
-                assert.throws(function () {
-                    invoke([undefined, {}], reduce);
-                });
-            });
-            it('null', function () {
-                assert.throws(function () {
-                    invoke([null, {}], reduce);
-                });
-            });
-            it('number', function () {
-                assert.throws(function () {
-                    invoke([1, {}], reduce);
-                });
-            });
-            it('Number', function () {
-                assert.throws(function () {
-                    invoke([new NumberConstructor(0), {}], reduce);
-                });
-            });
-            it('boolean', function () {
-                assert.throws(function () {
-                    invoke([true, {}], reduce);
-                });
-            });
-            it('Boolean', function () {
-                assert.throws(function () {
-                    invoke([new BooleanConstructor(false), {}], reduce);
-                });
-            });
-            it('string', function () {
-                assert.throws(function () {
-                    invoke(['', {}], reduce);
-                });
-            });
-            it('String', function () {
-                assert.throws(function () {
-                    invoke([new StringConstructor(''), {}], reduce);
-                });
-            });
-            it('regexp', function () {
-                assert.throws(function () {
-                    invoke([/ /, {}], reduce);
-                });
-            });
-            it('non plain object', function () {
-                function Constructor() {
-                    this.field = true;
-                }
-                assert.throws(function () {
-                    invoke([new Constructor(), {}], reduce);
-                });
-            });
+        it('both elements', function () {
+            assert.throws(function () {
+                invoke([1, 2], reduce);
+            }, Exception);
         });
-        describe('nested level', function () {
-            it('both elements', function () {
-                assert.throws(function () {
-                    invoke([{a: 1}, {a: 1}], reduce);
-                });
-            });
-            it('first element', function () {
-                assert.throws(function () {
-                    invoke([{a: 1}, {a: {}}], reduce);
-                });
-            });
-            it('second element', function () {
-                assert.throws(function () {
-                    invoke([{a: {}}, {a: 1}], reduce);
-                });
-            });
-            it('undefined', function () {
-                assert.throws(function () {
-                    invoke([{a: undefined}, {a: {}}], reduce);
-                });
-            });
-            it('null', function () {
-                assert.throws(function () {
-                    invoke([{a: null}, {a: {}}], reduce);
-                });
-            });
-            it('number', function () {
-                assert.throws(function () {
-                    invoke([{a: 1}, {a: {}}], reduce);
-                });
-            });
-            it('Number', function () {
-                assert.throws(function () {
-                    invoke([{a: new NumberConstructor(0)}, {a: {}}], reduce);
-                });
-            });
-            it('boolean', function () {
-                assert.throws(function () {
-                    invoke([{a: true}, {a: {}}], reduce);
-                });
-            });
-            it('Boolean', function () {
-                assert.throws(function () {
-                    invoke([{a: new BooleanConstructor(false)}, {a: {}}], reduce);
-                });
-            });
-            it('string', function () {
-                assert.throws(function () {
-                    invoke([{a: ''}, {a: {}}], reduce);
-                });
-            });
-            it('String', function () {
-                assert.throws(function () {
-                    invoke([{a: new StringConstructor('')}, {a: {}}], reduce);
-                });
-            });
-            it('regexp', function () {
-                assert.throws(function () {
-                    invoke([{a: / /}, {a: {}}], reduce);
-                });
-            });
-            it('non plain object', function () {
-                function Constructor() {
-                    this.field = true;
-                }
-                assert.throws(function () {
-                    invoke([{a: new Constructor()}, {a: {}}], reduce);
-                });
-            });
+        it('first element', function () {
+            assert.throws(function () {
+                invoke([1, {}], reduce);
+            }, Exception);
+        });
+        it('second element', function () {
+            assert.throws(function () {
+                invoke([{}, 1], reduce);
+            }, Exception);
+        });
+        it('undefined', function () {
+            assert.throws(function () {
+                invoke([undefined, {}], reduce);
+            }, Exception);
+        });
+        it('null', function () {
+            assert.throws(function () {
+                invoke([null, {}], reduce);
+            }, Exception);
+        });
+        it('number', function () {
+            assert.throws(function () {
+                invoke([1, {}], reduce);
+            }, Exception);
+        });
+        it('Number', function () {
+            assert.throws(function () {
+                invoke([new NumberConstructor(0), {}], reduce);
+            }, Exception);
+        });
+        it('boolean', function () {
+            assert.throws(function () {
+                invoke([true, {}], reduce);
+            }, Exception);
+        });
+        it('Boolean', function () {
+            assert.throws(function () {
+                invoke([new BooleanConstructor(false), {}], reduce);
+            }, Exception);
+        });
+        it('string', function () {
+            assert.throws(function () {
+                invoke(['', {}], reduce);
+            }, Exception);
+        });
+        it('String', function () {
+            assert.throws(function () {
+                invoke([new StringConstructor(''), {}], reduce);
+            }, Exception);
+        });
+        it('regexp', function () {
+            assert.throws(function () {
+                invoke([/ /, {}], reduce);
+            }, Exception);
+        });
+        it('non plain object', function () {
+            function Constructor() {
+                this.field = true;
+            }
+            assert.throws(function () {
+                invoke([new Constructor(), {}], reduce);
+            }, Exception);
         });
     });
     it('should use the default policy', function () {
