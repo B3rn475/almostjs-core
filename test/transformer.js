@@ -12,7 +12,7 @@ var _ = require('lodash'),
     Exception = require('../lib/exception');
 
 describe('Transformer', function () {
-    it('should be an function', function () {
+    it('should be a function', function () {
         assert.equal(typeof create, 'function');
     });
     it('should throw with no arguments', function () {

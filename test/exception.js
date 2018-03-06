@@ -10,7 +10,7 @@ var assert = require('assert'),
     createException = Exception;
 
 describe('Exception', function () {
-    it('should be an function', function () {
+    it('should be a function', function () {
         assert.equal(typeof Exception, 'function');
     });
     it('should be invocable with new', function () {
