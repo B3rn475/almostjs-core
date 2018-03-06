@@ -24,7 +24,7 @@
     "coveralls": "latest",
     "istanbul": "latest",
     "mocha": "latest",
-    "sinon": "^1.17.7"
+    "sinon": "^4.4.2"
   },
   "scripts": {
     "test": "mocha --recursive",
