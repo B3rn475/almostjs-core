@@ -22,6 +22,7 @@ exports.none = reducers.none;
 exports.single = reducers.single;
 exports.first = reducers.first;
 exports.last = reducers.last;
+exports.lazy = reducers.lazy;
 exports.merge = reducers.merge;
 exports.mergeOrSingle = reducers.mergeOrSingle;
 exports.concat = reducers.concat;
