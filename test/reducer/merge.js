@@ -1,6 +1,6 @@
 // Copyright (c) 2018, the ALMOsT project authors. Please see the
 // AUTHORS file for details. All rights reserved. Use of this source code is
-// governed by a MIT-style license that can be found in the LICENSE file.
+// governed by the MIT license that can be found in the LICENSE file.
 /*jslint node: true, nomen: true*/
 /*global describe, it, before*/
 "use strict";
@@ -143,6 +143,12 @@ describe('merge', function () {
             }, Exception);
         });
     });
+    describe('should throw exception if merging with specials an array', function () {
+        var reduce = r.merge(r.mergeOrSingle, {});
+        assert.throws(function () {
+            invoke([[], {}], reduce);
+        }, Exception);
+    });
     it('should use the default policy', function () {
         var first = {a: 1},
             second = {b: 2},
@@ -150,15 +156,12 @@ describe('merge', function () {
         assert.deepEqual(invoke([{a: first}, {a: second}], reduce),
             {a: first});
     });
-    it(
-        'should use the default policy even on single values',
-        function () {
-            var first = {},
-                reduce = r.merge(r.concat());
-            assert.deepEqual(invoke([{a: first}], reduce),
-                {a: [first]});
-        }
-    );
+    it('should use the default policy even on single values', function () {
+        var first = {},
+            reduce = r.merge(r.concat());
+        assert.deepEqual(invoke([{a: first}], reduce),
+            {a: [first]});
+    });
     it('should use the terminate on the policy', function () {
         var first = {},
             second = {},
@@ -169,41 +172,38 @@ describe('merge', function () {
             {a: [first, second, third]}
         );
     });
-    describe(
-        'should throw with invalid overloaded policies',
-        function () {
-            it('undefined', function () {
-                assert.throws(function () {
-                    r.merge(r.first(), undefined);
-                });
+    describe('should throw with invalid overloaded policies', function () {
+        it('undefined', function () {
+            assert.throws(function () {
+                r.merge(r.first(), undefined);
             });
-            it('bool (false)', function () {
-                assert.throws(function () {
-                    r.merge(r.first(), false);
-                });
+        });
+        it('bool (false)', function () {
+            assert.throws(function () {
+                r.merge(r.first(), false);
             });
-            it('bool (true)', function () {
-                assert.throws(function () {
-                    r.merge(r.first(), true);
-                });
+        });
+        it('bool (true)', function () {
+            assert.throws(function () {
+                r.merge(r.first(), true);
             });
-            it('string (empty)', function () {
-                assert.throws(function () {
-                    r.merge(r.first(), '');
-                });
+        });
+        it('string (empty)', function () {
+            assert.throws(function () {
+                r.merge(r.first(), '');
             });
-            it('string', function () {
-                assert.throws(function () {
-                    r.merge(r.first(), 'string');
-                });
+        });
+        it('string', function () {
+            assert.throws(function () {
+                r.merge(r.first(), 'string');
             });
-            it('number', function () {
-                assert.throws(function () {
-                    r.merge(r.first(), 0);
-                });
+        });
+        it('number', function () {
+            assert.throws(function () {
+                r.merge(r.first(), 0);
             });
-        }
-    );
+        });
+    });
     it('should use the overloaded policies', function () {
         var first = {},
             second = {},
@@ -213,14 +213,14 @@ describe('merge', function () {
             {a: first, b: second}
         );
     });
-    it('should not initialize accumulation if no data is provided', function () {
+    it('should initialize accumulation if no data is provided', function () {
         var first = {},
             second = {},
             third = {},
-            reduce = r.merge(r.first(), {b: r.flatten()});
+            reduce = r.merge(r.first(), {b: r.concat()});
         assert.deepEqual(
             invoke([{a: first}, {a: [second, third]}], reduce),
-            {a: first}
+            {a: first, b: []}
         );
     });
     it('should use the terminate on overloaded policies', function () {
@@ -231,6 +231,16 @@ describe('merge', function () {
         assert.deepEqual(
             invoke([{a: first}, {a: [second, third]}], reduce),
             {a: [first, second, third]}
+        );
+    });
+    it('should not store overloaded policies if reducer returns undefined', function () {
+        var first = {},
+            second = {},
+            third = {},
+            reduce = r.merge(r.first(), {a: r.reduce(_.noop)});
+        assert.deepEqual(
+            invoke([{a: first}, {a: [second, third]}], reduce),
+            {}
         );
     });
 });

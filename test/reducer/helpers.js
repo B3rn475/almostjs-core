@@ -1,6 +1,6 @@
 // Copyright (c) 2016, the ALMOsT project authors. Please see the
 // AUTHORS file for details. All rights reserved. Use of this source code is
-// governed by a MIT-style license that can be found in the LICENSE file.
+// governed by the MIT license that can be found in the LICENSE file.
 /*jslint node: true, nomen: true*/
 /*global describe, it, before*/
 "use strict";
@@ -85,7 +85,7 @@ describe('helpers', function () {
         it('should throw a message', function () {
             var reduce = r.single();
             try {
-                invoke([1, 2], reduce);
+                invoke([], reduce);
             } catch (e) {
                 assert.equal(typeof e.message, 'string');
             }
@@ -94,7 +94,7 @@ describe('helpers', function () {
             var message = {},
                 reduce = r.single(message);
             try {
-                invoke([1, 2], reduce);
+                invoke([], reduce);
             } catch (e) {
                 assert.equal(e.message, message);
             }
@@ -159,7 +159,7 @@ describe('helpers', function () {
                 reduce = r.concat();
             assert.deepEqual(invoke([first, second], reduce), [first, second]);
         });
-        it('shouldn\'t flatten', function () {
+        it('should not flatten', function () {
             var first = {$first: 1},
                 second = {$second: 1},
                 reduce = r.concat();
@@ -265,15 +265,12 @@ describe('helpers', function () {
             assert.deepEqual(invoke([{e: 1, a: first}, {e: 1, a: second}], reduce),
                 {'1': {e: 1, a: first}});
         });
-        it(
-            'should use the default policy even on single values',
-            function () {
-                var first = {},
-                    reduce = r.groupBy('f', r.merge());
-                assert.deepEqual(invoke([{f: 1, a: first}], reduce),
-                    {'1': {f: 1, a: first}});
-            }
-        );
+        it('should use the default policy even on single values', function () {
+            var first = {},
+                reduce = r.groupBy('f', r.merge());
+            assert.deepEqual(invoke([{f: 1, a: first}], reduce),
+                {'1': {f: 1, a: first}});
+        });
         it('should use the terminate on the policy', function () {
             var first = {},
                 second = {},

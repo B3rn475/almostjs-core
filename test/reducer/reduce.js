@@ -1,6 +1,6 @@
 // Copyright (c) 2016, the ALMOsT project authors. Please see the
 // AUTHORS file for details. All rights reserved. Use of this source code is
-// governed by a MIT-style license that can be found in the LICENSE file.
+// governed by the MIT license that can be found in the LICENSE file.
 /*jslint node: true, nomen: true*/
 /*global describe, it*/
 "use strict";
@@ -58,10 +58,10 @@ describe('reduce', function () {
     it('should return a function', function () {
         assert.equal(typeof r.reduce(_.noop), 'function');
     });
-    it('should not invoke the function during initialization', function () {
+    it('should not invoke accumulate during initialization', function () {
         var accumulate = sinon.spy();
         r.reduce(accumulate);
-        assert.ok(!accumulate.called);
+        assert.ok(accumulate.notCalled);
     });
     it('should attach a copy of the accumulator', function () {
         var accumulator = {accumulator: true},
@@ -89,27 +89,27 @@ describe('reduce', function () {
     it('should not invoke the terminate function during initialization', function () {
         var terminate = sinon.spy();
         r.reduce(_.noop, null, terminate);
-        assert.ok(!terminate.called);
+        assert.ok(terminate.notCalled);
     });
     it('should attach a copy of the accumulator', function () {
         var terminate = sinon.spy(),
             reduce = r.reduce(_.noop, null, terminate);
         assert.equal(reduce.terminate, terminate);
     });
-    it('should not invoke the reducer if no element is passed', function () {
+    it('should not invoke accumulate if no element is passed', function () {
         var accumulate = sinon.spy(),
             reduce = r.reduce(accumulate);
         assert.equal(invoke([], reduce), undefined);
-        assert.ok(!accumulate.called);
+        assert.ok(accumulate.notCalled);
     });
-    it('should not invoke the reducer if one element is passed', function () {
+    it('should not invoke accumulate if one element is passed', function () {
         var first = {},
             accumulate = sinon.spy(),
             reduce = r.reduce(accumulate);
         assert.equal(invoke([first], reduce), first);
-        assert.ok(!accumulate.called);
+        assert.ok(accumulate.notCalled);
     });
-    it('should invoke the reducer if two elements are passed', function () {
+    it('should invoke accumulate if two elements are passed', function () {
         var first = {},
             second = {},
             result = {},
@@ -122,7 +122,7 @@ describe('reduce', function () {
         assert.equal(invoke([first, second], reduce), result);
         assert.ok(accumulate.calledOnce);
     });
-    it('should invoke the reducer if one element and the accumulator are passed', function () {
+    it('should invoke accumulate if one element and the accumulator are passed', function () {
         var first = {},
             accumulator = {accumulator: true},
             result = {},
