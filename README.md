@@ -115,6 +115,9 @@ We provide a set of helpers to generate complex reduction policies:
  - `flatten()` it concatenates all the encountered values in an array (arrays are flattened in single elements)
  - `flattenDeep()` it concatenates all the encountered values in an array (arrays are flattened in single elements recursively)
  - `merge([policy], [specials])` all the encountered objects will be merged using the last value encountered for each property (if the `policy` argument is provided it will be used to reduce the different values encountered for each property, if the `specials` argument is provided it is expected to be an object with the form `{key: policy, ...}` the policies defined will be used instead of the default one for the related key)
+ - `mergeOrSingle()` if objects are encountered it recursively merges them with the same policy, if arrays are encountered it concatenates and recursively merges them with the same policy, if anything else is encountered it behaves like `single`
+ - `groupBy(key, [policy])` it returns an object which keys are the unique values of the `key` filed in each input and the value is the reduction of all the inputs with the same key, by default `concat`
+ - `lazy(policy)` if at least one input is present `policy` policy is applied normally, if no input is present it is like the policy was never there
 
 ### Example
 
