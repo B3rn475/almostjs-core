@@ -35,7 +35,7 @@ describe('mergeOrSingle', function () {
     it('should be a function', function () {
         assert.equal(typeof r.mergeOrSingle, 'function');
     });
-    it('should return empty object with not elements', function () {
+    it('should return empty object with no elements', function () {
         assert.deepEqual(invoke([], reduce), []);
     });
     it('should return the element with one element', function () {
