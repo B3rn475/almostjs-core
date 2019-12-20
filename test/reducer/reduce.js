@@ -67,7 +67,7 @@ describe('reduce', function () {
         var accumulator = {accumulator: true},
             reduce = r.reduce(_.noop, accumulator);
         assert.notEqual(reduce.accumulator, accumulator);
-        assert.deepEqual(reduce.accumulator, accumulator);
+        assert.deepStrictEqual(reduce.accumulator, accumulator);
     });
     it('should throw with a non function third argument', function () {
         var partial = _.partial(r.reduce, _.noop, null);
@@ -128,7 +128,7 @@ describe('reduce', function () {
             result = {},
             accumulate = sinon.spy(function (accumulated, value) {
                 assert.notEqual(accumulated, accumulator);
-                assert.deepEqual(accumulated, accumulator);
+                assert.deepStrictEqual(accumulated, accumulator);
                 assert.equal(value, first);
                 return result;
             }),
@@ -147,7 +147,7 @@ describe('reduce', function () {
             accumulator = {},
             terminate = sinon.spy(function (accumulated) {
                 assert.notEqual(accumulated, accumulator);
-                assert.deepEqual(accumulated, accumulator);
+                assert.deepStrictEqual(accumulated, accumulator);
                 return result;
             }),
             reduce = r.reduce(_.noop, accumulator, terminate);

@@ -137,7 +137,7 @@ describe('flattenDeep', function () {
         assert.ok(accumulate.calledOnce);
         assert.ok(accumulate.calledWith(sinon.match.object, first));
         assert.notEqual(accumulate.getCall(0).args[0], accumulator);
-        assert.deepEqual(accumulate.getCall(0).args[0], accumulator);
+        assert.deepStrictEqual(accumulate.getCall(0).args[0], accumulator);
     });
     it('should invoke accumulate if one element and the accumulator are passed one level deep', function () {
         var first = {},
@@ -150,7 +150,7 @@ describe('flattenDeep', function () {
         assert.ok(accumulate.calledOnce);
         assert.ok(accumulate.calledWith(sinon.match.object, first));
         assert.notEqual(accumulate.getCall(0).args[0], accumulator);
-        assert.deepEqual(accumulate.getCall(0).args[0], accumulator);
+        assert.deepStrictEqual(accumulate.getCall(0).args[0], accumulator);
     });
     it('should invoke accumulate if one element and the accumulator are passed two levels deep', function () {
         var first = {},
@@ -163,7 +163,7 @@ describe('flattenDeep', function () {
         assert.ok(accumulate.calledOnce);
         assert.ok(accumulate.calledWith(sinon.match.object, first));
         assert.notEqual(accumulate.getCall(0).args[0], accumulator);
-        assert.deepEqual(accumulate.getCall(0).args[0], accumulator);
+        assert.deepStrictEqual(accumulate.getCall(0).args[0], accumulator);
     });
     it('should invoke terminate if no elements are passed', function () {
         var terminate = sinon.spy(),
@@ -173,7 +173,7 @@ describe('flattenDeep', function () {
         assert.equal(invoke([], reduce), undefined);
         assert.ok(terminate.calledOnce);
         assert.notEqual(terminate.getCall(0).args[0], accumulator);
-        assert.deepEqual(terminate.getCall(0).args[0], accumulator);
+        assert.deepStrictEqual(terminate.getCall(0).args[0], accumulator);
     });
     it('should invoke terminate if no elements are passed one level deep', function () {
         var terminate = sinon.spy(),
@@ -183,7 +183,7 @@ describe('flattenDeep', function () {
         assert.equal(invoke([[], []], reduce), undefined);
         assert.ok(terminate.calledOnce);
         assert.notEqual(terminate.getCall(0).args[0], accumulator);
-        assert.deepEqual(terminate.getCall(0).args[0], accumulator);
+        assert.deepStrictEqual(terminate.getCall(0).args[0], accumulator);
     });
     it('should not invoke terminate if no elements are passed two level deep', function () {
         var terminate = sinon.spy(),
@@ -192,7 +192,7 @@ describe('flattenDeep', function () {
             reduce = r.flattenDeep(policy);
         assert.equal(invoke([[[]], []], reduce), undefined);
         assert.notEqual(terminate.getCall(0).args[0], accumulator);
-        assert.deepEqual(terminate.getCall(0).args[0], accumulator);
+        assert.deepStrictEqual(terminate.getCall(0).args[0], accumulator);
     });
     it('should return terminate result', function () {
         var result = {},

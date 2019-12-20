@@ -36,73 +36,73 @@ describe('mergeOrSingle', function () {
         assert.equal(typeof r.mergeOrSingle, 'function');
     });
     it('should return empty object with no elements', function () {
-        assert.deepEqual(invoke([], reduce), []);
+        assert.deepStrictEqual(invoke([], reduce), {});
     });
     it('should return the element with one element', function () {
-        assert.deepEqual(invoke([{}], reduce), {});
+        assert.deepStrictEqual(invoke([{}], reduce), {});
     });
     it('should merge all the elements', function () {
-        assert.deepEqual(invoke([{a: 1}, {b: 2}], reduce), {a: 1, b: 2});
+        assert.deepStrictEqual(invoke([{a: 1}, {b: 2}], reduce), {a: 1, b: 2});
     });
     describe('should preserve non plain objects', function () {
         it('undefined', function () {
             var value = _.noop();
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('null', function () {
             var value = null;
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('number (0)', function () {
             var value = 0;
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('number (1)', function () {
             var value = 1;
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('boolean (true)', function () {
             var value = true;
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('boolean (false)', function () {
             var value = false;
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('Boolean (true)', function () {
             var value = new BooleanConstructor(true);
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('Boolean (false)', function () {
             var value = new BooleanConstructor(false);
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('string', function () {
             var value = 'string';
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('string (empty)', function () {
             var value = '';
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('String', function () {
             var value = new StringConstructor('string');
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('String (empty)', function () {
             var value = new StringConstructor('');
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('regexp', function () {
             var value = / /;
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
         it('non plain object', function () {
             function Constructor() {
                 this.field = true;
             }
             var value = new Constructor();
-            assert.deepEqual(invoke([value], reduce), value);
+            assert.deepStrictEqual(invoke([value], reduce), value);
         });
     });
     describe('should throw exception if merging non plain objects', function () {

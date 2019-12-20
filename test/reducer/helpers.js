@@ -146,24 +146,24 @@ describe('helpers', function () {
         });
         it('should return empty array with not elements', function () {
             var reduce = r.concat();
-            assert.deepEqual(invoke([], reduce), []);
+            assert.deepStrictEqual(invoke([], reduce), []);
         });
         it('should return an array of one element', function () {
             var element = {},
                 reduce = r.concat();
-            assert.deepEqual(invoke([element], reduce), [element]);
+            assert.deepStrictEqual(invoke([element], reduce), [element]);
         });
         it('should return all the elements', function () {
             var first = {$first: 1},
                 second = {$second: 1},
                 reduce = r.concat();
-            assert.deepEqual(invoke([first, second], reduce), [first, second]);
+            assert.deepStrictEqual(invoke([first, second], reduce), [first, second]);
         });
         it('should not flatten', function () {
             var first = {$first: 1},
                 second = {$second: 1},
                 reduce = r.concat();
-            assert.deepEqual(invoke([first, [second]], reduce), [first, [second]]);
+            assert.deepStrictEqual(invoke([first, [second]], reduce), [first, [second]]);
         });
     });
     describe('reduceBy', function () {
@@ -193,14 +193,14 @@ describe('helpers', function () {
             var first = {},
                 second = {},
                 reduce = r.reduceBy('d');
-            assert.deepEqual(invoke([{d: 1, a: first}, {d: 1, b: second}], reduce),
+            assert.deepStrictEqual(invoke([{d: 1, a: first}, {d: 1, b: second}], reduce),
                 [{d: 1, a: first, b: second}]);
         });
         it('should use the policy', function () {
             var first = {},
                 second = {},
                 reduce = r.reduceBy('e', r.first());
-            assert.deepEqual(invoke([{e: 1, a: first}, {e: 1, a: second}], reduce),
+            assert.deepStrictEqual(invoke([{e: 1, a: first}, {e: 1, a: second}], reduce),
                 [{e: 1, a: first}]);
         });
         it(
@@ -208,7 +208,7 @@ describe('helpers', function () {
             function () {
                 var first = {},
                     reduce = r.reduceBy('f', r.concat());
-                assert.deepEqual(invoke([{f: 1, a: first}], reduce),
+                assert.deepStrictEqual(invoke([{f: 1, a: first}], reduce),
                     [[{f: 1, a: first}]]);
             }
         );
@@ -216,7 +216,7 @@ describe('helpers', function () {
             var first = {},
                 second = {},
                 reduce = r.reduceBy('g', r.flatten());
-            assert.deepEqual(
+            assert.deepStrictEqual(
                 invoke([{g: 1, a: first}, {g: 1, a: second}], reduce),
                 [[{g: 1, a: first}, {g: 1, a: second}]]
             );
@@ -231,51 +231,51 @@ describe('helpers', function () {
         });
         it('should return empty object', function () {
             var reduce = r.groupBy('a');
-            assert.deepEqual(invoke([], reduce), {});
+            assert.deepStrictEqual(invoke([], reduce), {});
         });
         it('should return a single key', function () {
             var reduce = r.groupBy('b');
-            assert.deepEqual(invoke([{b: 1}], reduce), {'1': [{b: 1}]});
+            assert.deepStrictEqual(invoke([{b: 1}], reduce), {'1': [{b: 1}]});
         });
         it('should return a single key with both elements', function () {
             var first = {},
                 second = {},
                 reduce = r.groupBy('c');
-            assert.deepEqual(invoke([{c: 1, a: first}, {c: 1, b: second}], reduce),
+            assert.deepStrictEqual(invoke([{c: 1, a: first}, {c: 1, b: second}], reduce),
                 {'1': [{c: 1, a: first}, {c: 1, b: second}]});
         });
         it('should return all the same elements with different keys', function () {
             var first = {},
                 second = {},
                 reduce = r.groupBy('d');
-            assert.deepEqual(invoke([{d: 1, a: first}, {d: 2, a: second}], reduce),
+            assert.deepStrictEqual(invoke([{d: 1, a: first}, {d: 2, a: second}], reduce),
                 {'1': [{d: 1, a: first}], '2': [{d: 2, a: second}]});
         });
         it('should concat by default', function () {
             var first = {},
                 second = {},
                 reduce = r.groupBy('d');
-            assert.deepEqual(invoke([{d: 1, a: first}, {d: 1, b: second}], reduce),
+            assert.deepStrictEqual(invoke([{d: 1, a: first}, {d: 1, b: second}], reduce),
                 {'1': [{d: 1, a: first}, {d: 1, b: second}]});
         });
         it('should use the policy', function () {
             var first = {},
                 second = {},
                 reduce = r.groupBy('e', r.first());
-            assert.deepEqual(invoke([{e: 1, a: first}, {e: 1, a: second}], reduce),
+            assert.deepStrictEqual(invoke([{e: 1, a: first}, {e: 1, a: second}], reduce),
                 {'1': {e: 1, a: first}});
         });
         it('should use the default policy even on single values', function () {
             var first = {},
                 reduce = r.groupBy('f', r.merge());
-            assert.deepEqual(invoke([{f: 1, a: first}], reduce),
+            assert.deepStrictEqual(invoke([{f: 1, a: first}], reduce),
                 {'1': {f: 1, a: first}});
         });
         it('should use the terminate on the policy', function () {
             var first = {},
                 second = {},
                 reduce = r.groupBy('g', r.flatten());
-            assert.deepEqual(
+            assert.deepStrictEqual(
                 invoke([{g: 1, a: first}, {g: 1, a: second}], reduce),
                 {'1': [{g: 1, a: first}, {g: 1, a: second}]}
             );

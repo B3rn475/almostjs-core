@@ -33,26 +33,26 @@ describe('merge', function () {
     });
     it('should return empty object with not elements', function () {
         var reduce = r.merge();
-        assert.deepEqual(invoke([], reduce), {});
+        assert.deepStrictEqual(invoke([], reduce), {});
     });
     it('should return a single element', function () {
         var reduce = r.merge();
-        assert.deepEqual(invoke([{}], reduce), {});
+        assert.deepStrictEqual(invoke([{}], reduce), {});
     });
     it('should return an object with more elements', function () {
         var reduce = r.merge();
-        assert.deepEqual(invoke([{}, {}], reduce), {});
+        assert.deepStrictEqual(invoke([{}, {}], reduce), {});
     });
     it('should return an array if all elements are arrays', function () {
         var reduce = r.merge(),
             result = invoke([[], []], reduce);
-        assert.deepEqual(result, []);
+        assert.deepStrictEqual(result, []);
         assert.ok(_.isArray(result));
     });
     it('should return an array if all elements are arrays 1 deep', function () {
         var reduce = r.merge(),
             result = invoke([{a: []}, {a: []}], reduce);
-        assert.deepEqual(result, {a: []});
+        assert.deepStrictEqual(result, {a: []});
         assert.ok(_.isArray(result.a));
     });
     it('should return an object if elements are mixed object or arrays', function () {
@@ -68,7 +68,7 @@ describe('merge', function () {
 
     it('should deep merge elements by default', function () {
         var reduce = r.merge();
-        assert.deepEqual(invoke([{a: {b: {c: 1}}}, {a: {b: {d: 2}}}], reduce),
+        assert.deepStrictEqual(invoke([{a: {b: {c: 1}}}, {a: {b: {d: 2}}}], reduce),
             {a: {b: {c: 1, d: 2}}});
     });
     describe('should throw exception if merging non plain objects', function () {
@@ -155,13 +155,13 @@ describe('merge', function () {
         var first = {a: 1},
             second = {b: 2},
             reduce = r.merge(r.first());
-        assert.deepEqual(invoke([{a: first}, {a: second}], reduce),
+        assert.deepStrictEqual(invoke([{a: first}, {a: second}], reduce),
             {a: first});
     });
     it('should use the default policy even on single values', function () {
         var first = {},
             reduce = r.merge(r.concat());
-        assert.deepEqual(invoke([{a: first}], reduce),
+        assert.deepStrictEqual(invoke([{a: first}], reduce),
             {a: [first]});
     });
     it('should use the terminate on the policy', function () {
@@ -169,7 +169,7 @@ describe('merge', function () {
             second = {},
             third = {},
             reduce = r.merge(r.flatten());
-        assert.deepEqual(
+        assert.deepStrictEqual(
             invoke([{a: first}, {a: [second, third]}], reduce),
             {a: [first, second, third]}
         );
@@ -212,7 +212,7 @@ describe('merge', function () {
             reduce = r.merge(r.first(), {b: r.last()}),
             result = invoke([{a: first, b: first}, {a: second}], reduce);
         assert.ok(_.isPlainObject(result));
-        assert.deepEqual(result, {a: first, b: second});
+        assert.deepStrictEqual(result, {a: first, b: second});
     });
     it('should initialize accumulation if no data is provided', function () {
         var first = {},
@@ -221,7 +221,7 @@ describe('merge', function () {
             reduce = r.merge(r.first(), {b: r.concat()}),
             result = invoke([{a: first}, {a: [second, third]}], reduce);
         assert.ok(_.isPlainObject(result));
-        assert.deepEqual(result, {a: first, b: []});
+        assert.deepStrictEqual(result, {a: first, b: []});
     });
     it('should use the terminate on overloaded policies', function () {
         var first = {},
@@ -230,7 +230,7 @@ describe('merge', function () {
             reduce = r.merge(r.first(), {a: r.flatten()}),
             result = invoke([{a: first}, {a: [second, third]}], reduce);
         assert.ok(_.isPlainObject(result));
-        assert.deepEqual(result, {a: [first, second, third]});
+        assert.deepStrictEqual(result, {a: [first, second, third]});
     });
     it('should not store overloaded policies if reducer returns undefined', function () {
         var first = {},
@@ -239,6 +239,6 @@ describe('merge', function () {
             reduce = r.merge(r.first(), {a: r.reduce(_.noop)}),
             result = invoke([{a: first}, {a: [second, third]}], reduce);
         assert.ok(_.isPlainObject(result));
-        assert.deepEqual(result, {});
+        assert.deepStrictEqual(result, {});
     });
 });

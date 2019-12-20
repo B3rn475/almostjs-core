@@ -97,7 +97,7 @@ describe('Transformer', function () {
                 });
             },
             t = create(traverse);
-        assert.deepEqual(t(input), input);
+        assert.deepStrictEqual(t(input), input);
     });
     it('should follow the reduction policy', function () {
         var first = {},
@@ -139,7 +139,7 @@ describe('Transformer', function () {
         reduce.accumulator = [1, 2];
         t = create(traverse, reduce);
         assert.notEqual(t(input), reduce.accumulator);
-        assert.deepEqual(t(input), reduce.accumulator);
+        assert.deepStrictEqual(t(input), reduce.accumulator);
     });
     it('should invoke terminate', function () {
         var first = {},

@@ -77,10 +77,10 @@ describe('lazy', function () {
             accumulate = sinon.spy(_.identity),
             policy = r.reduce(accumulate, accumulator),
             reduce = r.lazy(policy);
-        assert.deepEqual(invoke([first], reduce), accumulator);
+        assert.deepStrictEqual(invoke([first], reduce), accumulator);
         assert.ok(accumulate.calledOnce);
         assert.notEqual(accumulate.getCall(0).args[0], accumulator);
-        assert.deepEqual(accumulate.getCall(0).args[0], accumulator);
+        assert.deepStrictEqual(accumulate.getCall(0).args[0], accumulator);
         assert.equal(accumulate.getCall(0).args[1], first);
     });
     it('should invoke accumulate if two elements are passed', function () {
@@ -109,6 +109,6 @@ describe('lazy', function () {
         assert.equal(invoke([{}], reduce), result);
         assert.ok(terminate.calledOnce);
         assert.notEqual(terminate.getCall(0).args[0], accumulator);
-        assert.deepEqual(terminate.getCall(0).args[0], accumulator);
+        assert.deepStrictEqual(terminate.getCall(0).args[0], accumulator);
     });
 });
