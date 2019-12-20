@@ -22,13 +22,13 @@
   },
   "devDependencies": {
     "coveralls": "^3.0.9",
-    "istanbul": "latest",
     "mocha": "^6.2.2",
+    "nyc": "^14.1.1",
     "sinon": "^4.4.2"
   },
   "scripts": {
     "test": "mocha --recursive",
-    "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --recursive",
-    "coveralls": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --recursive -R spec && cat ./coverage/lcov.info | coveralls && rm -rf ./coverage"
+    "coverage": "nyc npm test",
+    "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls"
   }
 }
